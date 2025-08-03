@@ -6,12 +6,12 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="aidesk",
     version="0.1.0",
-    author="Your Name",
+    author="levindemo",
     author_email="your.email@example.com",
     description="A simple web service to generate files via API",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/aidesk",
+    url="https://github.com/levindemo/aidesk",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
