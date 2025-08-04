@@ -13,6 +13,7 @@ CONFIG_PATH = 'aidesk_config.json'
 SESSIONS_PATH = 'aidesk_sessions.json'
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
 
+
 def load_template(template_name):
     """Load an HTML template file"""
     template_path = os.path.join(TEMPLATES_DIR, template_name)
@@ -30,9 +31,10 @@ def get_config():
             return json.load(f)
 
     # Create default config with sample user (username: admin, password: admin)
+    default_password = os.getenv("AIDESK_ADMIN_PASSWORD", "admin")
     default_config = {
         'users': {
-            'admin': hashlib.sha256('admin'.encode()).hexdigest()
+            'admin': hashlib.sha256(default_password.encode()).hexdigest()
         }
     }
 
@@ -77,6 +79,7 @@ def validate_session(session_id):
     sessions = load_sessions()
     return session_id in sessions and sessions[session_id].get('valid', False)
 
+
 def get_host_info():
     """获取主机名和IP地址"""
     hostname = socket.gethostname()
@@ -90,23 +93,28 @@ def get_host_info():
         ip_address = socket.gethostbyname(hostname)
     return hostname, ip_address
 
+
 def sanitize_filename(filename):
     """清理文件名，防止路径遍历攻击"""
     return os.path.basename(filename).replace('/', '').replace('\\', '')
+
 
 def generate_session_id():
     """生成唯一的会话ID"""
     return str(uuid.uuid4())
 
+
 def hash_password(password):
     """对密码进行哈希处理"""
     return hashlib.sha256(password.encode('utf-8')).hexdigest()
+
 
 def is_authenticated(server_state, session_id):
     """检查会话是否有效"""
     if not session_id:
         return False
     return session_id in server_state['sessions']
+
 
 def format_timestamp(timestamp):
     """格式化时间戳为人类可读格式"""
