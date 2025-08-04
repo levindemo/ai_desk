@@ -1,5 +1,6 @@
 import json
 import hashlib
+import time
 import uuid
 from urllib.parse import parse_qs
 from ..utils import load_template, save_sessions, load_sessions, get_config
@@ -9,13 +10,13 @@ sessions = load_sessions()
 
 def handle_login_form(handler):
     """Handle the login form page"""
-    template = load_template('login.html')
+    template = load_template('login2.html')
     handler.send_response(200)
     handler.send_header('Content-type', 'text/html')
     handler.end_headers()
     handler.wfile.write(template.encode('utf-8'))
 
-def handle_login_api(handler, post_data):
+def handle_login_api(handler, post_data, success_callback):
     """Handle the login API request"""
     # Parse form data
     data = parse_qs(post_data.decode('utf-8'))
@@ -37,6 +38,12 @@ def handle_login_api(handler, post_data):
                 'username': username,
                 'valid': True
             }
+            success_callback(session_id,{
+                'username': username,
+                'valid': True,
+                'created_at': time.time(),
+                'last_active': time.time()
+            })
             save_sessions(sessions)
             
             # Set session cookie

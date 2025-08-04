@@ -1,30 +1,41 @@
 from setuptools import setup, find_packages
+import pathlib
 
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
+here = pathlib.Path(__file__).parent.resolve()
+
+# 获取长描述
+long_description = (here / 'README.md').read_text(encoding='utf-8')
 
 setup(
-    name="aidesk",
-    version="0.2.0",
-    author="Your Name",
-    author_email="your.email@example.com",
-    description="A simple web service with file operations and authentication",
+    name='aidesk',
+    version='0.2.a',
+    description='A simple web service with file operations and instance management',
     long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/aidesk",
-    packages=find_packages(),
-    package_data={
-        'aidesk': ['templates/*.html', 'static/*'],
-    },
+    long_description_content_type='text/markdown',
+    url='https://github.com/yourusername/aidesk',
+    author='Your Name',
+    author_email='your.email@example.com',
     classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
-    python_requires='>=3.6',
+    keywords='web service, file management, instance management',
+    packages=find_packages(exclude=['tests']),
+    python_requires='>=3.6, <4',
     entry_points={
         'console_scripts': [
-            'aidesk = aidesk.cli:main',
+            'aidesk=aidesk.cli:main',
         ],
     },
+    project_urls={
+        'Bug Reports': 'https://github.com/yourusername/aidesk/issues',
+        'Source': 'https://github.com/yourusername/aidesk/',
+    },
+    include_package_data=True,
 )

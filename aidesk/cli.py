@@ -1,4 +1,5 @@
 import argparse
+import sys
 import os
 from .server import run_server
 
@@ -15,7 +16,14 @@ def main():
     if not os.path.exists('uploads'):
         os.makedirs('uploads')
 
-    run_server(args.host, args.port, args.debug)
+    try:
+        run_server(args.host, args.port, args.debug)
+    except KeyboardInterrupt:
+        print("\nServer stopped by user")
+        sys.exit(0)
+    except Exception as e:
+        print(f"Error starting server: {str(e)}")
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
