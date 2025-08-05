@@ -5,16 +5,17 @@ import time
 from ..utils import load_template, format_timestamp
 
 
-def handle_index(handler, is_authenticated):
+def handle_index(handler, is_authenticated, master_info):
     """Handle the main index page"""
     template = load_template('index.html')
-    content = template
-    # 替换模板变量
-    # content = template.replace('{{ master_hostname }}', master_info['hostname'])
-    # content = content.replace('{{ master_ip }}', master_info['ip'])
-    # content = content.replace('{{ master_port }}', str(master_info['port']))
-    # content = content.replace('{{ master_start_time }}', format_timestamp(master_info['start_time']))
-
+    if master_info:
+        # 替换模板变量
+        content = template.replace('{{ master_hostname }}', master_info['hostname'])
+        content = content.replace('{{ master_ip }}', master_info['ip'])
+        content = content.replace('{{ master_port }}', str(master_info['port']))
+        content = content.replace('{{ master_start_time }}', format_timestamp(master_info['start_time']))
+    else:
+        content = template
     handler.send_response(200)
     handler.send_header('Content-type', 'text/html')
     handler.end_headers()

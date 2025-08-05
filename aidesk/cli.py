@@ -1,7 +1,7 @@
 import argparse
 import logging
-from .server import run_server
-from .client.registration import SlaveRegistrar
+from aidesk.server import run_server
+from aidesk.client.registration import ClientRegistrar
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
         if not args.master_url:
             parser.error("当使用--slave选项时，必须指定--master-url")
 
-        slave_registrar = SlaveRegistrar(
+        slave_registrar = ClientRegistrar(
             master_url=args.master_url,
             slave_host=args.host,
             slave_port=args.port

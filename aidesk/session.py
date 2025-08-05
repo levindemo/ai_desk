@@ -25,6 +25,10 @@ def set_user_session(session_id, session_data):
     server_state['sessions'][session_id] = session_data
 
 
+def get_master_state():
+    return server_state['master_info']
+
+
 def set_master_state(port):
     # 获取并存储服务器信息
     hostname, ip_address = get_host_info()

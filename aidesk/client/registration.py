@@ -3,13 +3,15 @@ import requests
 import threading
 import socket
 from datetime import datetime
-from ..utils import get_host_info
+import traceback
+
+from aidesk.utils import get_host_info
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class SlaveRegistrar:
+class ClientRegistrar:
     def __init__(self, master_url, slave_host=None, slave_port=None, register_interval=30):
         """
         初始化slave注册器
@@ -32,7 +34,7 @@ class SlaveRegistrar:
     def start(self):
         """启动注册和心跳线程"""
         if not self.slave_port:
-            raise ValueError("必须指定slave的端口号")
+            raise ValueError("Slave port must be specified")
 
         self.running = True
         self.registration_thread = threading.Thread(
@@ -41,14 +43,15 @@ class SlaveRegistrar:
             name="slave-registration"
         )
         self.registration_thread.start()
-        logger.info(f"开始向master {self.master_url} 注册slave实例 {self.instance_id}")
+        logger.info(f"Starting registration thread for slave instance {self.instance_id} to master {self.master_url}")
 
     def stop(self):
         """停止注册和心跳线程"""
         self.running = False
         if self.registration_thread:
             self.registration_thread.join()
-        logger.info(f"已停止向master注册slave实例 {self.instance_id}")
+
+        logger.info(f"Registration thread stopped for slave instance {self.instance_id}")
 
     def _registration_loop(self):
         """注册和心跳循环"""
@@ -69,10 +72,10 @@ class SlaveRegistrar:
         """向master注册当前slave实例"""
         try:
             # 获取当前slave的信息
-            host_info = get_host_info()
+            hostname, ip_address = get_host_info()
 
             data = {
-                "hostname": host_info['hostname'],
+                "hostname": hostname,
                 "ip": self.slave_host,
                 "port": self.slave_port,
                 "start_time": self.start_time
@@ -88,17 +91,19 @@ class SlaveRegistrar:
                 result = response.json()
                 if result.get('success'):
                     self.registration_success = True
-                    logger.info(f"Slave实例 {self.instance_id} 成功注册到master")
+                    logger.info(f"Slave instance {self.instance_id} registered to master successfully")
                     return True
                 else:
-                    logger.warning(f"注册失败: {result.get('message', '未知错误')}")
+                    logger.warning(f"Registration failed: {result.get('message', 'Unknown error')}")
             else:
-                logger.warning(f"注册请求失败，状态码: {response.status_code}")
+                logger.warning(f"Registration request failed, status code: {response.status_code}")
 
         except requests.exceptions.RequestException as e:
-            logger.error(f"注册到master时发生错误: {str(e)}")
+            logger.error(f"Registration to master failed: {str(e)}")
+            traceback.print_exc()
         except Exception as e:
-            logger.error(f"注册过程中发生意外错误: {str(e)}")
+            logger.error(f"Registration process failed: {str(e)}")
+            traceback.print_exc()
 
         self.registration_success = False
         return False
@@ -113,12 +118,12 @@ class SlaveRegistrar:
             )
 
             if response.status_code != 200:
-                logger.warning(f"心跳发送失败，状态码: {response.status_code}")
+                logger.warning(f"Heartbeat sent failed, status code: {response.status_code}")
                 self.registration_success = False
             else:
                 # 心跳成功
                 pass
 
         except requests.exceptions.RequestException as e:
-            logger.error(f"发送心跳时发生错误: {str(e)}")
+            logger.error(f"Heartbeat sent failed: {str(e)}")
             self.registration_success = False

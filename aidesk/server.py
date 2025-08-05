@@ -1,14 +1,14 @@
-import datetime
 import http.server
-import socketserver
-import os
-import time
-from urllib.parse import urlparse, parse_qs
+import http.server
 import json
-from .api_handlers import home, auth, file_handling, instance_management
-from .instance_housekeeper import hook_state_for_cleanup
-from .session import get_server_state, set_user_session, set_master_state
-from .utils import load_template, get_session_id, validate_session, get_host_info
+import socketserver
+from urllib.parse import urlparse, parse_qs
+
+from aidesk.api_handlers import home, auth, file_handling, instance_management
+from aidesk.client.registration import ClientRegistrar
+from aidesk.instance_housekeeper import hook_state_for_cleanup
+from aidesk.session import get_server_state, set_user_session, set_master_state, get_master_state
+from aidesk.utils import get_session_id, validate_session
 
 
 class AideskHandler(http.server.BaseHTTPRequestHandler):
@@ -23,7 +23,9 @@ class AideskHandler(http.server.BaseHTTPRequestHandler):
 
         # Route to appropriate handler
         if path == '/':
-            home.handle_index(self, is_authenticated)
+            home.handle_index(self, is_authenticated, get_master_state())
+        elif path == '/upload-file':
+            file_handling.handle_upload_file_page(self,is_authenticated)
         elif path == '/login':
             auth.handle_login_form(self)
         elif path == '/logout':
@@ -65,9 +67,9 @@ class AideskHandler(http.server.BaseHTTPRequestHandler):
             else:
                 self.send_json_response({"success": False, "message": "Authentication required"}, 401)
         elif self.path == '/api/instances/register':
-            instance_management.handle_register_instance(self, get_server_state())
+            instance_management.handle_register_instance(self, post_data, get_server_state())
         elif self.path == '/api/instances/ping':
-            instance_management.handle_ping_instance(self, get_server_state())
+            instance_management.handle_ping_instance(self, post_data, get_server_state())
         else:
             self.send_error(404, "Not Found")
 
@@ -92,3 +94,21 @@ def run_server(host, port, debug=False):
         except KeyboardInterrupt:
             print('\nServer stopped.')
             httpd.shutdown()
+
+
+def main():
+    host = 'localhost'
+    port = 8001
+    master_url = 'http://localhost:8000'
+    slave_registrar = ClientRegistrar(
+        master_url=master_url,
+        slave_host=host,
+        slave_port=port
+    )
+    slave_registrar.start()
+
+    run_server(host, port)
+
+
+if __name__ == '__main__':
+    main()
