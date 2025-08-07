@@ -8,7 +8,7 @@ long_description = (here / 'README.md').read_text(encoding='utf-8')
 
 setup(
     name='aidesk',
-    version='0.2.c',
+    version='0.3.0',
     description='A simple web service with file operations and instance management',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -34,11 +34,15 @@ setup(
     entry_points={
         'console_scripts': [
             'aidesk=aidesk.cli:main',
+            # 'aid=aidesk.cli:main',
+            # 'aidesk-cli=aidesk.cli:main',
+            # 'ai_desk=aidesk.cli:main',
         ],
     },
     project_urls={
-        'Bug Reports': 'https://github.com/yourusername/aidesk/issues',
-        'Source': 'https://github.com/yourusername/aidesk/',
+        'Bug Reports': 'https://github.com/levindemo/aidesk/issues',
+        'Source': 'https://github.com/levindemo/aidesk/',
     },
     include_package_data=True,
+
 )

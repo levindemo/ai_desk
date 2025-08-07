@@ -8,15 +8,21 @@ import json
 import hashlib
 from pathlib import Path
 
+SYSTEM_TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+
+USE_HOME_FOLDER_PATH = os.getenv('HOME') or os.path.expanduser('~')
+CONFIG_FOLDER = os.path.join(USE_HOME_FOLDER_PATH, '.aidesk/config')
+# Create config folder if it doesn't exist
+os.makedirs(CONFIG_FOLDER, exist_ok=True)
+
 # Configuration
-CONFIG_PATH = 'aidesk_config.json'
-SESSIONS_PATH = 'aidesk_sessions.json'
-TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+CONFIG_PATH = os.path.join(CONFIG_FOLDER, 'config.json')
+SESSIONS_PATH = os.path.join(CONFIG_FOLDER, 'sessions.json')
 
 
 def load_template(template_name):
     """Load an HTML template file"""
-    template_path = os.path.join(TEMPLATES_DIR, template_name)
+    template_path = os.path.join(SYSTEM_TEMPLATES_DIR, template_name)
     try:
         with open(template_path, 'r', encoding='utf-8') as f:
             return f.read()

@@ -2,7 +2,7 @@ import json
 import os
 import time
 
-from ..utils import load_template, format_timestamp
+from aidesk.utils import load_template, format_timestamp
 
 
 def handle_index(handler, is_authenticated, master_info):
